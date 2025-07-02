@@ -7,6 +7,7 @@ import os
 from ret_code import ReturnCode
 from config_path import *
 import sys
+import json
 from excel_diff import compare_excel_rows
 cur_excel_file_name = ""
 last_excel_file_name = ""
@@ -44,8 +45,25 @@ def delete_files(file_names):
     for file_name in file_names:
         if(os.path.isfile(file_name) and os.path.exists(file_name)):
             os.remove(file_name)
+def get_resolved_record():
+    if(os.path.exists(record_file_path) and os.path.isfile(record_file_path)):
+        with open(record_file_path, 'r') as file:
+            json_obj = json.load(file)
+            return json_obj
+    return []
+def is_resolved(revision):
+    return revision in  get_resolved_record()
+def mark_resolved(revision):
+    resolved_record = get_resolved_record()
+    if(revision not in resolved_record):
+        resolved_record.append(revision)
+        with open(record_file_path, 'w') as file:
+            json.dump(resolved_record, file)
+
+
 if __name__ == "__main__":
     input_revision = -1
+    mark_resolved(-1)
     if(len(sys.argv) > 1):
         input_revision = int(sys.argv[1])
     if(len(sys.argv) > 2):
@@ -57,7 +75,7 @@ if __name__ == "__main__":
     else:
         on_error_occur(feishu_self_error_url, "excel svn checkout failed")
         exit()
-    commits, commit_ret_code = svn_util.get_last_one_day_commits(repository_local_path, path_in_repo, days=200)
+    commits, commit_ret_code = svn_util.get_last_one_day_commits(repository_local_path, path_in_repo, days=2)
     if(commit_ret_code is not None and not commit_ret_code.success):
         on_error_occur(feishu_self_error_url, commit_ret_code.error_content)
         exit()
@@ -69,6 +87,8 @@ if __name__ == "__main__":
             try:
                 cur_revision = cur_commit['revision']
                 last_revision = last_commit['revision']
+                if(is_resolved(cur_revision)):
+                    continue
                 specific_revision = cur_revision
                 ts =  int(time.time() * 1000)
             except Exception as e:
@@ -96,7 +116,9 @@ if __name__ == "__main__":
                 if(not compare_rst.success):
                     on_error_occur(feishu_self_error_url, compare_rst.error_content)
                     exit()
+                mark_resolved(cur_revision)
                 delete_files([cur_excel_file_full_name, last_excel_file_full_name])
+                
                 if(input_revision != -1):
                     break
             except Exception as e:
