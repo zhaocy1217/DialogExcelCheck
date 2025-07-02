@@ -42,7 +42,7 @@ def run_mono_excel_diff(current_excel_name, last_excel_name, svn_msg):
         return ReturnCode(success=False, error_content="Error: The 'svn' command was not found. Please ensure Subversion is installed and in your system's PATH.")
 def delete_files(file_names):
     for file_name in file_names:
-        if(os.path.exists(file_name)):
+        if(os.path.isfile(file_name) and os.path.exists(file_name)):
             os.remove(file_name)
 if __name__ == "__main__":
     input_revision = -1
