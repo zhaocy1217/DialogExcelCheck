@@ -205,7 +205,7 @@ class LocalizeChecker():
             },
         ]
 
-        excel = self.excel_name if hasattr(self, 'excelName') else "APS_Dialog.xlsm" #"APS_Dialog.xlsm"
+        excel = self.excel_name if hasattr(self, 'excel_name') else "APS_Dialog.xlsm" #"APS_Dialog.xlsm"
         sheet = "CN"
         ids = defaultdict(list)
         file_path=os.path.join(self.path, excel)
@@ -283,7 +283,7 @@ class LocalizeChecker():
         )
 
     async def warn_APS_Dialog_CN(self):
-        excel = self.excel_name if hasattr(self, 'excelName') else "APS_Dialog.xlsm" #"APS_Dialog.xlsm"
+        excel = self.excel_name if hasattr(self, 'excel_name') else "APS_Dialog.xlsm" #"APS_Dialog.xlsm"
         sheet = "CN"
         file_path=os.path.join(self.path, excel)
         column_order, data_list = get_sheet_column_data(
