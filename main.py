@@ -70,7 +70,7 @@ if __name__ == "__main__":
                 cur_revision = cur_commit['revision']
                 last_revision = last_commit['revision']
                 specific_revision = cur_revision
-                ts =  time.time() * 1000
+                ts =  int(time.time() * 1000)
             except Exception as e:
                 on_error_occur(feishu_self_error_url, f"excel svn two commits parse failed: {e}")
                 exit()
