@@ -19,7 +19,6 @@ def check_excel(excel_name):
 def on_error_occur(url, content):
     cur_excel_file_full_name = os.path.join(repository_local_path, cur_excel_file_name)
     last_excel_file_full_name = os.path.join(repository_local_path, last_excel_file_name)
-    delete_files([cur_excel_file_full_name, last_excel_file_full_name])
     loc_check.NoticeManager().send_file_notice(
             url=url,
             title="错误通知",
@@ -27,6 +26,7 @@ def on_error_occur(url, content):
             is_error=True,
             error_usrs={loc_check.NoticeManager().name_id.get('赵超跃')}# 填写需要通知用户的飞书id
         )
+    delete_files([cur_excel_file_full_name, last_excel_file_full_name])
 def run_mono_excel_diff(current_excel_name, last_excel_name, svn_msg):
     sheet = "CN"
     column = "CN"
