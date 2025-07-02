@@ -64,7 +64,6 @@ def mark_resolved(revision):
 
 if __name__ == "__main__":
     input_revision = -1
-    mark_resolved(-1)
     if(len(sys.argv) > 1):
         input_revision = int(sys.argv[1])
     if(len(sys.argv) > 2):
