@@ -28,6 +28,7 @@ def on_error_occur(url, content):
             error_usrs={loc_check.NoticeManager().name_id.get('赵超跃')}# 填写需要通知用户的飞书id
         )
     delete_files([cur_excel_file_full_name, last_excel_file_full_name])
+    raise Exception(content)
 def run_mono_excel_diff(current_excel_name, last_excel_name, svn_msg):
     sheet = "CN"
     column = "CN"
@@ -70,10 +71,11 @@ if __name__ == "__main__":
         is_debug = (sys.argv[2]) == 'debug'
         if(is_debug):
             feishu_public_error_url = feishu_self_error_url
-    if(svn_util.checkout_subprocess(repository_local_path)):
+    ret_code = svn_util.checkout_subprocess(repository_local_path)
+    if(ret_code.success):
         print("checkout success")
     else:
-        on_error_occur(feishu_self_error_url, "excel svn checkout failed")
+        on_error_occur(feishu_self_error_url, ret_code.error_content)
         exit()
     commits, commit_ret_code = svn_util.get_last_one_day_commits(repository_local_path, path_in_repo, days=2)
     if(commit_ret_code is not None and not commit_ret_code.success):
