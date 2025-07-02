@@ -46,6 +46,7 @@ def delete_files(file_names):
         if(os.path.isfile(file_name) and os.path.exists(file_name)):
             os.remove(file_name)
 def get_resolved_record():
+    record_file_path = get_record_file_path()
     if(os.path.exists(record_file_path) and os.path.isfile(record_file_path)):
         with open(record_file_path, 'r') as file:
             json_obj = json.load(file)
@@ -57,7 +58,7 @@ def mark_resolved(revision):
     resolved_record = get_resolved_record()
     if(revision not in resolved_record):
         resolved_record.append(revision)
-        with open(record_file_path, 'w') as file:
+        with open(get_record_file_path(), 'w') as file:
             json.dump(resolved_record, file)
 
 
