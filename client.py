@@ -3,6 +3,7 @@ import os
 import re
 import xml.etree.ElementTree
 from ret_code import ReturnCode
+username_password =["--username=zhushaowei","--password=PQ7wQJbr7GK023vpl"]
 class Client:
     def __init__(self, cwd = os.getcwd(), stdout = subprocess.PIPE):
         self.cmd = ["svn"]
@@ -13,6 +14,7 @@ class Client:
 
     def log(self, file_path, num, decoding = 'utf8'):
         log_cmd = self.cmd + ["log", "--xml", file_path,"--limit", str(num)]
+        log_cmd.extend(username_password)
         if self.log_content is None:
             self.log_content = []
             data = subprocess.Popen(log_cmd, stdout = self.stdout, cwd = self.cwd).stdout.read()
@@ -34,7 +36,7 @@ class Client:
             start_version = end_version - 1
 
         diff_cmd = self.cmd + ["diff", "-r", "{0}:{1}".format(start_version, end_version)]
-
+        diff_cmd.extend(username_password)
         if cache and self.diff_cache.setdefault(start_version, {})[end_version]:
             diff_content = self.diff_cache[start_version][end_version]
         else:

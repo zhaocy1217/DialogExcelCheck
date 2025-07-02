@@ -3,10 +3,12 @@ from client import Client
 import os
 from ret_code import ReturnCode
 import time
+from client import username_password
 def checkout_subprocess(repo_path_local):
     command = [
-        "svn","checkout",".","--username=zhushaowei","--password=PQ7wQJbr7GK023vpl"
+        "svn","checkout","."
     ]
+    command.extend(username_password)
     try:
         subprocess.run(command, cwd=repo_path_local, check=True, capture_output=True, text=True)
         return ReturnCode(success=True, error_content="")
@@ -21,6 +23,7 @@ def get_file_at_revision_subprocess(repo_path_local,repo_url, file_path, revisio
         "svn","export","--force", "--revision",str(revision),full_file_path,
         output_file
     ]
+    command.extend(username_password)
     try:
         subprocess.run(command, cwd=repo_path_local, check=True, capture_output=True, text=True)
         return ReturnCode(success=True, error_content="")
