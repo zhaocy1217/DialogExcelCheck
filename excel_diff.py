@@ -3,9 +3,12 @@ import difflib
 import os
 from loc_check import NoticeManager
 from ret_code import ReturnCode
-from config_path import ai_check_url
+from config_path import ai_check_url, feishu_self_error_url, feishu_public_error_url
 import requests
 import json
+
+
+
 class ExcelData:
     def __init__(self, id, cn):
         self.id = str(id)  # Ensure ID is treated as string for consistent comparison
@@ -67,6 +70,16 @@ def compare_excel_rows(current_excel_file, last_excel_file, svn_msg):
             jsonObj['insert_modified'][row.id] = row.cn
     try:
         response = requests.request(method= 'post', url=ai_check_url, headers=headers, json= jsonObj)
+        response_json_obj = json.loads(response.text)
+        invalid_rows = response_json_obj["insert_modified"]
+        if(invalid_rows.len>0):
+            NoticeManager().send_file_notice(
+                url= feishu_self_error_url, #feishu_public_error_url,
+                title="错误通知",
+                content=f'SVN 提交版本: {svn_msg}\n AI检查返回的错误文本: {invalid_rows}', 
+                is_error=True,
+                error_usrs={NoticeManager().name_id.get('赵超跃'), NoticeManager().name_id.get('苏湘鹏')}# 填写需要通知用户的飞书id
+            )
         print("ai check response: ", response.text)
     except Exception as e:
         return ReturnCode(False, f"Error: {e}")

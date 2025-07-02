@@ -48,6 +48,10 @@ if __name__ == "__main__":
     input_revision = -1
     if(len(sys.argv) > 1):
         input_revision = int(sys.argv[1])
+    if(len(sys.argv) > 2):
+        is_debug = (sys.argv[2]) == 'debug'
+        if(is_debug):
+            feishu_public_error_url = feishu_self_error_url
     if(svn_util.checkout_subprocess(repository_local_path)):
         print("checkout success")
     else:

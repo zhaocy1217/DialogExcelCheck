@@ -7,7 +7,7 @@ from datetime import timedelta, datetime
 from openpyxl import load_workbook
 from typing import Optional
 from collections import Counter
-
+from config_path import feishu_public_error_url
 import requests
 
 
@@ -55,16 +55,16 @@ class LocalizeChecker():
             self.error_usrs = [self.name_id.get('赵超跃')]
 
         finally: 
-            return
+            #return
             error_content = "**错误简要**：\n" + '\n'.join(self.error_brief)
             if self.error_message:
                 if not is_warn:
                     # 发送检查错误, 本地化错误需要专门发送到本地化群
-                    self.send_error(error_content=error_content, url="https://open.feishu.cn/open-apis/bot/v2/hook/e3069555-89da-4679-89ee-3bb5ab7bb1f2")# url填写飞书机器人的url
+                    self.send_error(error_content=error_content, url=feishu_public_error_url)# url填写飞书机器人的url
 
                 else:
                     # 发送检查警告
-                    self.send_warning(error_content=error_content, url="https://open.feishu.cn/open-apis/bot/v2/hook/e3069555-89da-4679-89ee-3bb5ab7bb1f2")
+                    self.send_warning(error_content=error_content, url=feishu_public_error_url)
             return self.error_message
 
     
