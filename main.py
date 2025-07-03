@@ -67,16 +67,16 @@ def mark_resolved(revision):
 
 if __name__ == "__main__":
     input_revision = -1
-    is_pub = False
+    only_check_excel_is_pub = False
     if(len(sys.argv) > 1):
         input_revision = int(sys.argv[1])
     if(len(sys.argv) > 2):
-        is_pub = (sys.argv[2]) == 'True' or (sys.argv[2]) == 'true' or (sys.argv[2]) == '1' or (sys.argv[2]) == True
+        only_check_excel_is_pub = (sys.argv[2]) == 'True' or (sys.argv[2]) == 'true' or (sys.argv[2]) == '1' or (sys.argv[2]) == True
     ret_code = svn_util.checkout_subprocess(repository_local_path)
     if(ret_code.success):
         print("checkout success")
-        if(is_pub):
-            check_excel(config_path.path_in_repo, is_pub)
+        if(only_check_excel_is_pub):
+            check_excel(config_path.path_in_repo, True)
             exit(0)
     else:
         on_error_occur(feishu_self_error_url, ret_code.error_content)
