@@ -63,7 +63,7 @@ class LocalizeChecker():
         finally: 
             #return
             svn_revision = extract_revision(self.excel_name)
-            error_content = "**错误简要**：\n"+f'SVN版本号:{svn_revision}' +'\n'+ '\n'.join(self.error_brief)
+            error_content = "**错误简要**：\n"+f'触发当前检查SVN版本号:{svn_revision}，错误不代表是本次提交' +'\n'+ '\n'.join(self.error_brief)
             if self.error_message:
                 if not is_warn:
                     # 发送检查错误, 本地化错误需要专门发送到本地化群

@@ -77,7 +77,7 @@ def compare_excel_rows(current_excel_file, last_excel_file, svn_msg):
             NoticeManager().send_file_notice(
                 url= feishu_self_error_url, #feishu_public_error_url,
                 title="错误通知",
-                content=f'SVN 提交版本: {svn_msg}\n AI检查返回的错误文本: {invalid_rows}', 
+                content=f'错误文本的SVN提交版本: {svn_msg}\n AI检查返回的错误文本: {invalid_rows}', 
                 is_error=True,
                 error_usrs={NoticeManager().name_id.get('赵超跃'), NoticeManager().name_id.get('苏湘鹏')}# 填写需要通知用户的飞书id
             )
