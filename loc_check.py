@@ -62,7 +62,8 @@ class LocalizeChecker():
 
         finally: 
             #return
-            error_content = "**错误简要**：\n" + '\n'.join(self.error_brief)
+            svn_revision = extract_revision(self.excel_name)
+            error_content = "**错误简要**：\n"+f'SVN版本号:{svn_revision}' +'\n'+ '\n'.join(self.error_brief)
             if self.error_message:
                 if not is_warn:
                     # 发送检查错误, 本地化错误需要专门发送到本地化群
@@ -93,102 +94,102 @@ class LocalizeChecker():
             # 检查是否有大写I,过滤VIP，ID
             {
                 "condition": lambda cn, id: 'I' in cn.replace('VIP', '').replace('ID', '') and id not in cn_special_I_ids,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】存在I\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】存在I\n"
             },
             # 检查开头结尾是否有空格
             {
                 "condition": lambda cn, id: not re.match(r"^(?! )(?:(?! $).)*$", cn, re.DOTALL) and id not in cn_special_blank_ids,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】开头或结尾存在空格\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】开头或结尾存在空格\n"
             },
             # 检查是否存在手动换行
             {
                 "condition": lambda cn, id: re.search(r"(?<!\\)\n", cn),
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】中存在换行符\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】中存在换行符\n"
             },
             # 检查出现钢铁
             {
                 "condition": lambda cn, id: "钢铁" in cn and id not in cn_special_steel_food_ids,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】出现钢铁\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现钢铁\n"
             },
             # 检查出现食物
             {
                 "condition": lambda cn, id: "食物" in cn and id not in cn_special_steel_food_ids,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】出现食物\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现食物\n"
             },
             # 检查出现城堡
             {
                 "condition": lambda cn, id: ("城堡" in cn or "主城" in cn  or "城内" in cn) and id not in cn_special_castle_ids,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】基地名称不正确\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】基地名称不正确\n"
             },
             # 检查出现数字\d{2,}以上
             {
                 "condition": lambda cn, id: re.search(r"\d{2,}以上", cn) and not re.search(r"\d{2,}及以上", cn) and id not in cn_special_above_below_ids,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】出现数字以上\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现数字以上\n"
             },
             # 检查出现数字\d{2,}以下
             {
                 "condition": lambda cn, id: re.search(r"\d{2,}以下", cn) and not re.search(r"\d{2,}及以下", cn) and id not in cn_special_above_below_ids,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】出现数字以下\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现数字以下\n"
             },
             # 检查出现诺亚
             {
                 "condition": lambda cn, id: "诺亚" in cn,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】出现诺亚\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现诺亚\n"
             },
             # 检查时间是否符合格式要求
             {
                 "condition": lambda cn, id, expect_time: not isinstance(expect_time, datetime),
-                "error_message": lambda id, expect_time: f"【{excel}】【id={id}】【预期时间={expect_time}】不符合时间格式\n"
+                "error_message": lambda id, expect_time: f"【{excel_name_for_msg}】【id={id}】【预期时间={expect_time}】不符合时间格式\n"
             },
             # 检查出现劵或卷
             {
                 "condition": lambda cn, id: ("劵" in cn or "卷" in cn) and id not in cn_special_certificate_id,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】出现劵或卷\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现劵或卷\n"
             },
             # 检查只能出现装饰物，不能只出现装饰
             {
                 "condition": lambda cn, id: "装饰" in cn.replace("装饰物", "") and id not in cn_special_decorate_id,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】使用装饰而不是装饰物\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】使用装饰而不是装饰物\n"
             },
             # 检查不能出现总部装扮、总部皮肤、总部特效、特效皮肤
             {
                 "condition": lambda cn, id: any(term in cn for term in ["总部装扮", "总部皮肤", "总部特效", "特效皮肤"]) and id not in cn_special_base_effect_skin_ids,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】出现总部装扮或总部皮肤或总部特效或特效皮肤\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现总部装扮或总部皮肤或总部特效或特效皮肤\n"
             },
             # 检查不能出现车队
             {
                 "condition": lambda cn, id: "车队" in cn and id not in cn_special_team_ids,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】出现车队\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现车队\n"
             },
             # 检查不能出现Min\min
             {
                 "condition": lambda cn, id: ("min" in cn or "Min" in cn) and id not in cn_special_min_ids,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】出现Min\\min\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现Min\\min\n"
             },
              # 检查不能出现大地图、野外
             {
                 "condition": lambda cn, id: "大地图" in cn or "野外" in cn,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】出现大地图、野外\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现大地图、野外\n"
             },
              # 检查不能出现资源点
             {
                 "condition": lambda cn, id: "资源点" in cn,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】出现资源点\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现资源点\n"
             },
              # 检查不能出现雷达事件
             {
                 "condition": lambda cn, id: "雷达事件" in cn,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】出现雷达事件\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现雷达事件\n"
             },
              # 检查不能出现士气值
             {
                 "condition": lambda cn, id: "士气值" in cn,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】出现士气值\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现士气值\n"
             },
             # 检查不能出现本服、跨服
             {
                 "condition": lambda cn, id: "本服、跨服" in cn,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】出现本服、跨服\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现本服、跨服\n"
             },
         ]
 
@@ -197,24 +198,25 @@ class LocalizeChecker():
             # 检查开头结尾是否有空格
             {
                 "condition": lambda cn, id: not re.match(r"^(?! )(?:(?! $).)*$", cn, re.DOTALL) and id not in cn_special_blank_ids,
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】开头或结尾存在空格\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】开头或结尾存在空格\n"
             },
             # 检查是否存在手动换行
             {
                 "condition": lambda cn, id: re.search(r"(?<!\\)\n", cn),
-                "error_message": lambda id, cn: f"【{excel}】【id={id}】【cn={cn}】中存在换行符\n"
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】中存在换行符\n"
             },
             # 检查时间是否符合格式要求
             {
                 "condition": lambda cn, id, expect_time: not isinstance(expect_time, datetime),
-                "error_message": lambda id, expect_time: f"【{excel}】【id={id}】【预期时间={expect_time}】不符合时间格式\n"
+                "error_message": lambda id, expect_time: f"【{excel_name_for_msg}】【id={id}】【预期时间={expect_time}】不符合时间格式\n"
             },
         ]
 
-        excel = self.excel_name if self.excel_name is not None else self.raw_excel_name #"APS_Dialog.xlsm"
+        excel_name_for_msg = self.raw_excel_name #"APS_Dialog.xlsm"
+        excel_file_name = self.excel_name if self.excel_name is not None else self.raw_excel_name
         sheet = "CN"
         ids = defaultdict(list)
-        file_path=os.path.join(self.path, excel)
+        file_path=os.path.join(self.path, excel_file_name)
         column_order, data_list = get_sheet_column_data(
             path=file_path,
             sheet_name=sheet,
@@ -314,8 +316,7 @@ class LocalizeChecker():
                     if need_tarns != None:
                         need_tarns = int(need_tarns)
                     if need_tarns == 1:
-                        revision = extract_revision(excel)
-                        error_msg = f"【SVN版本号】: {revision}【{self.raw_excel_name}】【id={id}】【expect_time={expect_time}】【1-不需要翻译={need_tarns}】有词条没有改成0\n"
+                        error_msg = f"【{self.raw_excel_name}】【id={id}】【expect_time={expect_time}】【1-不需要翻译={need_tarns}】有词条没有改成0\n"
                         self.add_error(
                                 error_message=error_msg,
                                 sign=sign
