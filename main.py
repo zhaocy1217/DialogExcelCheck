@@ -1,3 +1,4 @@
+import config_path
 import loc_check
 import asyncio
 import svn_util
@@ -78,7 +79,11 @@ if __name__ == "__main__":
     commits, commit_ret_code = svn_util.get_last_one_day_commits(repository_local_path, path_in_repo, days=2)
     if(commit_ret_code is not None and not commit_ret_code.success):
         on_error_occur(feishu_self_error_url, commit_ret_code.error_content)
-    if(commits is not None and len(commits) > 1):
+    if(commits is None or len(commits) == 0):
+        on_error_occur(feishu_self_error_url, "excel svn get last one day commits failed")
+    if(len(commits) == 1):
+        check_excel(config_path.path_in_repo)
+    if(len(commits) > 1):
         for i in range(len(commits) - 1):
             if(input_revision == -1 or int(commits[i]['revision']) == input_revision):
                 cur_commit = commits[i]
@@ -118,5 +123,4 @@ if __name__ == "__main__":
                         break
                 except Exception as e:
                     on_error_occur(feishu_self_error_url, f"excel diff failed: {e}")
-    else:
-        on_error_occur(feishu_self_error_url, "excel svn get last two commits failed")
+   

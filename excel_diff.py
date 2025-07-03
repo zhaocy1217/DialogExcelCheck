@@ -75,7 +75,7 @@ def compare_excel_rows(current_excel_file, last_excel_file, svn_msg):
         #invalid_rows['TestError'] = 'TestError'
         if(len(invalid_rows) > 0):
             NoticeManager().send_file_notice(
-                url= feishu_self_error_url, #feishu_public_error_url,
+                url= feishu_public_error_url,
                 title="错误通知",
                 content=f'错误文本的SVN提交版本: {svn_msg}\n AI检查返回的错误文本: {invalid_rows}', 
                 is_error=True,
