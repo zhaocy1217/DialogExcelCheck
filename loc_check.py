@@ -81,7 +81,7 @@ class LocalizeChecker():
         local_path: 本地存储配置的路径
         is_pub: 是否是发版检查
         """
-        self.error_usrs = [self.name_id.get('赵超跃')]#[self.name_id.get('赵超跃'), self.name_id.get('苏湘鹏'), self.name_id.get('赵超跃')] # 填写需要通知用户的飞书id
+        self.error_usrs = []#[self.name_id.get('赵超跃')]#[self.name_id.get('赵超跃'), self.name_id.get('苏湘鹏'), self.name_id.get('赵超跃')] # 填写需要通知用户的飞书id
         return await self.check(
             funcs=self.check_APS_Dialog_CN,
             local_path=local_path,
@@ -283,7 +283,7 @@ class LocalizeChecker():
             self.error_usrs.append(md)
 
     async def warn_CN(self, local_path):
-        self.error_usrs = [self.name_id.get('田明东'), self.name_id.get('赵超跃')]
+        self.error_usrs = [self.name_id.get('田明东')]
         return await self.check(
             funcs=self.warn_APS_Dialog_CN,
             local_path=local_path,
@@ -321,12 +321,16 @@ class LocalizeChecker():
                                 error_message=error_msg,
                                 sign=sign
                             )
-    
-    def send_error(self, error_content: str, url:str):
-        # 发送错误报告到通知群或指定群
-        error_usrs = {self.name_id.get('赵超跃')}
+    def get_error_usr(self):
+        error_usrs = set()# {self.name_id.get('赵超跃')}
         for user in self.error_usrs:
                 error_usrs.add(user)
+        if(len(error_usrs) == 0):
+            error_usrs.add(self.name_id.get('田明东'))
+        return error_usrs
+    def send_error(self, error_content: str, url:str):
+        # 发送错误报告到通知群或指定群
+        error_usrs = self.get_error_usr()
         NoticeManager().send_file_notice(
             url=url,
             title="错误通知",
@@ -336,9 +340,7 @@ class LocalizeChecker():
         )
     
     def send_warning(self, error_content: str, url:str):
-        error_usrs = {self.name_id.get('赵超跃')}
-        for user in self.error_usrs:
-                error_usrs.add(user)
+        error_usrs = self.get_error_usr()
         # 发送警告报告到通知群
         NoticeManager().send_file_notice(
             url=url,
@@ -464,7 +466,8 @@ class NoticeManager():
         if error_usrs:
             error_at = self.get_error_at(error_usrs=error_usrs)
         else:
-            error_at = self.get_error_at(error_usrs={self.name_id.get('赵超跃')})
+            error_at = self.get_error_at(set())
+        #     error_at = self.get_error_at(error_usrs={self.name_id.get('赵超跃')})
 
         if is_error:
             template = "red" 

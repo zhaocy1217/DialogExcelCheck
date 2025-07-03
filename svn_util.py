@@ -4,9 +4,10 @@ import os
 from ret_code import ReturnCode
 import time
 from client import username_password
+from typing import Optional
 def checkout_subprocess(repo_path_local):
     command = [
-        "svn","checkout","."
+        "svn","update"
     ]
     command.extend(username_password)
     try:
@@ -64,8 +65,9 @@ def get_last_one_day_commits(repository_local_path, file_path, days = 1):
             date_one_day_ago =  time.time() - 24 * 60 * 60*days
             for log_entry in log_entries:
                 d = time.mktime(time.strptime(log_entry['date'], "%Y-%m-%dT%H:%M:%S.%fZ"))
-                if(d < date_one_day_ago):
-                    break
+                if(len(commits) != 1):
+                    if(d < date_one_day_ago):
+                        break
                 commits.append({
                     'revision': log_entry['revision'],
                     'author': log_entry['author'],

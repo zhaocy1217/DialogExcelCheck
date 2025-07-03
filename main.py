@@ -52,6 +52,8 @@ def get_resolved_record():
     if(os.path.exists(record_file_path) and os.path.isfile(record_file_path)):
         with open(record_file_path, 'r') as file:
             json_obj = json.load(file)
+            if(json_obj is None):
+                return []
             return json_obj
     return []
 def is_resolved(revision):

@@ -24,19 +24,24 @@ class ExcelData:
     def __hash__(self):
         return hash((self.id, self.cn))
 
-def read_excel_data(file_path, id_column, cn_column):
+def read_excel_data(file_path, id_column, cn_column, sign_column):
     try:
         df = pd.read_excel(file_path, sheet_name="CN")
+        id_column_index = df.columns.get_loc(id_column)
+        cn_column_index = df.columns.get_loc(cn_column)
         data_list = []
+        sign_column_index = df.columns.get_loc(sign_column)
+        id_sign_dict = {}
         for index, row in df.iterrows():
-            id_val = row.get(id_column)
-            cn_val = row.get(cn_column)
-
+            id_val = row.iloc[id_column_index]
+            cn_val = row.iloc[cn_column_index]
+            sign_val = row.iloc[sign_column_index]
             if id_val is not None and cn_val is not None:
                 data_list.append(ExcelData(id_val, cn_val))
+                id_sign_dict[str(id_val)] = str(sign_val)
             else:
-                return None, ReturnCode(False, f"row {index} in {file_path} has missing data in '{id_column}' or '{cn_column}'.")
-        return data_list, None
+                return None,None, ReturnCode(False, f"row {index} in {file_path} has missing data in '{id_column}' or '{cn_column}'.")
+        return data_list, id_sign_dict, None
     except FileNotFoundError:
         print(f"Error: File not found at {file_path}")
         return None, ReturnCode(False, f"File not found at {file_path}")
@@ -50,10 +55,10 @@ def read_excel_data(file_path, id_column, cn_column):
 def compare_excel_rows(current_excel_file, last_excel_file, svn_msg):
     differ = difflib.Differ()
     modified_rows = []
-    old_data, old_data_ret_code = read_excel_data(last_excel_file, "id", "CN")
+    old_data, old_id_sign_dict, old_data_ret_code = read_excel_data(last_excel_file, "id", "CN", "签名")
     if(old_data_ret_code is not None and not old_data_ret_code.success):
         return old_data_ret_code
-    new_data, new_data_ret_code = read_excel_data(current_excel_file, "id", "CN")
+    new_data, new_id_sign_dict, new_data_ret_code = read_excel_data(current_excel_file, "id", "CN", "签名")
     if(new_data_ret_code is not None and not new_data_ret_code.success):
         return new_data_ret_code
     sm = difflib.SequenceMatcher(None, [str(d) for d in old_data], [str(d) for d in new_data])
@@ -74,12 +79,21 @@ def compare_excel_rows(current_excel_file, last_excel_file, svn_msg):
         invalid_rows = response_json_obj["insert_modified"]
         #invalid_rows['TestError'] = 'TestError'
         if(len(invalid_rows) > 0):
+            error_usrs = set()
+            for id, cn in invalid_rows.items():
+                if(id in new_id_sign_dict):
+                    sign = new_id_sign_dict[id]
+                    if(sign is None or sign == 'nan'):
+                        sign = '田明东'
+                    error_usrs.add(NoticeManager().name_id.get(sign))
+            if(len(error_usrs) == 0):
+                error_usrs.add(NoticeManager().name_id.get('田明东'))
             NoticeManager().send_file_notice(
                 url= feishu_public_error_url,
                 title="错误通知",
                 content=f'错误文本的SVN提交版本: {svn_msg}\n AI检查返回的错误文本: {invalid_rows}', 
                 is_error=True,
-                error_usrs={NoticeManager().name_id.get('赵超跃'), NoticeManager().name_id.get('苏湘鹏')}# 填写需要通知用户的飞书id
+                error_usrs= error_usrs# 填写需要通知用户的飞书id
             )
         print("ai check response: ", response.text)
     except Exception as e:
