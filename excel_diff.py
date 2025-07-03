@@ -84,10 +84,9 @@ def compare_excel_rows(current_excel_file, last_excel_file, svn_msg):
                 if(id in new_id_sign_dict):
                     sign = new_id_sign_dict[id]
                     if(sign is None or sign == 'nan'or sign not in NoticeManager().name_id):
-                        sign = '田明东'
+                        continue
                     error_usrs.add(NoticeManager().name_id.get(sign))
-            if(len(error_usrs) == 0):
-                error_usrs.add(NoticeManager().name_id.get('田明东'))
+            error_usrs.add(NoticeManager().name_id.get('田明东'))
             NoticeManager().send_file_notice(
                 url= feishu_public_error_url,
                 title="错误通知",

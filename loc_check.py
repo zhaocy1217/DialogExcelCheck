@@ -324,9 +324,9 @@ class LocalizeChecker():
     def get_error_usr(self):
         error_usrs = set()# {self.name_id.get('赵超跃')}
         for user in self.error_usrs:
-                error_usrs.add(user)
-        if(len(error_usrs) == 0):
-            error_usrs.add(self.name_id.get('田明东'))
+            error_usrs.add(user)
+        #if(len(error_usrs) == 0):
+        error_usrs.add(self.name_id.get('田明东'))
         return error_usrs
     def send_error(self, error_content: str, url:str):
         # 发送错误报告到通知群或指定群
