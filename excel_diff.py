@@ -83,7 +83,7 @@ def compare_excel_rows(current_excel_file, last_excel_file, svn_msg):
             for id, cn in invalid_rows.items():
                 if(id in new_id_sign_dict):
                     sign = new_id_sign_dict[id]
-                    if(sign is None or sign == 'nan'):
+                    if(sign is None or sign == 'nan'or sign not in NoticeManager().name_id):
                         sign = '田明东'
                     error_usrs.add(NoticeManager().name_id.get(sign))
             if(len(error_usrs) == 0):
