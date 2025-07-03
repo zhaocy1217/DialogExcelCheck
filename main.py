@@ -62,7 +62,6 @@ def mark_resolved(revision):
         with open(get_record_file_path(), 'w') as file:
             json.dump(resolved_record, file)
 
-
 if __name__ == "__main__":
     input_revision = -1
     if(len(sys.argv) > 1):

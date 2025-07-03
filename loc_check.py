@@ -24,10 +24,16 @@ cn_special_base_effect_skin_ids = {'item_desc610184'}
 cn_special_team_ids = {'season_s4_activity1200012_story_desc', 221056, 'battlesystem_info1_new', 1500930, 'city_trade_tips1017', 1501830, 210185, 210186, 210187, 1501330, 'skill_desc_402020_new', 'report_prop25', 2000539, 1501730, 'science_221043_new', 1401130, 1501230, 457009, 1400630, 1500730, 1501630, 372287, 'science_221055_new', 220358, 1401030, 1501130, 'city_trade_tips1012', 'battlesystem_info1', 'power_display_new_002', 801105, 457554, 457555, 457556, 457557, 457558, 457559, 457560, 'science_221044_new', 457561, 457563, 1401430, 1500630, 141150, 1501530, 'skill_desc_402020', 'report_prop24', 1401830, 1501030, 'science_221054_new', 221043, 221044, 221045, 221046, 221047, 1501430, 221049, 'report_helper_strategy_34_detail', 221051, 221053, 221054, 221055}
 cn_special_min_ids = {'season_s3_update_notice_14'}
 
+def extract_revision(excel_name):
+    integers = re.findall(r'\d+', excel_name)
+    if(len(integers) >= 1):
+        return integers[0]
+    return -1
 
 
 class LocalizeChecker():
-    excel_name = "APS_Dialog.xlsm"
+    raw_excel_name = "APS_Dialog.xlsm"
+    excel_name = None
     def __init__(self):
         self.name_id = NoticeManager.name_id
         # 记录aps表的各个字段，检查字段删除（新增字段时需更新）
@@ -205,7 +211,7 @@ class LocalizeChecker():
             },
         ]
 
-        excel = self.excel_name if hasattr(self, 'excel_name') else "APS_Dialog.xlsm" #"APS_Dialog.xlsm"
+        excel = self.excel_name if self.excel_name is not None else self.raw_excel_name #"APS_Dialog.xlsm"
         sheet = "CN"
         ids = defaultdict(list)
         file_path=os.path.join(self.path, excel)
@@ -222,7 +228,7 @@ class LocalizeChecker():
         if missing_list:
             missing_list = list(dict(missing_list).keys())
             self.add_error(
-                error_message = f'【{excel}】缺少【{missing_list}】列\n'
+                error_message = f'【{self.raw_excel_name}】缺少【{missing_list}】列\n'
             )
             return
 
@@ -283,7 +289,7 @@ class LocalizeChecker():
         )
 
     async def warn_APS_Dialog_CN(self):
-        excel = self.excel_name if hasattr(self, 'excel_name') else "APS_Dialog.xlsm" #"APS_Dialog.xlsm"
+        excel = self.excel_name if self.excel_name is not None else self.raw_excel_name #"APS_Dialog.xlsm"
         sheet = "CN"
         file_path=os.path.join(self.path, excel)
         column_order, data_list = get_sheet_column_data(
@@ -308,7 +314,8 @@ class LocalizeChecker():
                     if need_tarns != None:
                         need_tarns = int(need_tarns)
                     if need_tarns == 1:
-                        error_msg = f"【{excel}】【id={id}】【expect_time={expect_time}】【1-不需要翻译={need_tarns}】有词条没有改成0\n"
+                        revision = extract_revision(excel)
+                        error_msg = f"【SVN版本号】: {revision}【{self.raw_excel_name}】【id={id}】【expect_time={expect_time}】【1-不需要翻译={need_tarns}】有词条没有改成0\n"
                         self.add_error(
                                 error_message=error_msg,
                                 sign=sign

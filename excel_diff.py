@@ -72,6 +72,7 @@ def compare_excel_rows(current_excel_file, last_excel_file, svn_msg):
         response = requests.request(method= 'post', url=ai_check_url, headers=headers, json= jsonObj)
         response_json_obj = json.loads(response.text)
         invalid_rows = response_json_obj["insert_modified"]
+        invalid_rows.append('TestError')
         if(len(invalid_rows) > 0):
             NoticeManager().send_file_notice(
                 url= feishu_self_error_url, #feishu_public_error_url,
