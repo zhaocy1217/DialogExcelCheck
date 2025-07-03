@@ -101,7 +101,8 @@ if __name__ == "__main__":
                 if(not export_last_file_rst.success):
                     on_error_occur(feishu_self_error_url, export_last_file_rst.error_content)
                 try:
-                    check_excel(cur_excel_file_name)
+                    if(i == 0):
+                        check_excel(cur_excel_file_name)
                 except Exception as e:
                     on_error_occur(feishu_self_error_url, f"excel check failed: {e}")
                 try:
