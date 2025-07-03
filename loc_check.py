@@ -452,6 +452,8 @@ class NoticeManager():
         "刘博语": "7482608283694481411",
         "胡哲": "7459231689765191699",
         "倪千惠": "7501527646409719811",
+        "马行宇": "7498186273967783937",
+        "刘子宁": "7468493151927435292",
     }
 
     def send_file_notice(self, url:str, title: str, content: str = "", is_error: bool = False, error_usrs: set = None):

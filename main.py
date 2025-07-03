@@ -12,10 +12,10 @@ import json
 from excel_diff import compare_excel_rows
 cur_excel_file_name = ""
 last_excel_file_name = ""
-def check_excel(excel_name):
+def check_excel(excel_name, is_pub = False):
     checker = loc_check.LocalizeChecker()
     checker.excel_name = excel_name
-    coroutine = checker.check_CN(local_path=repository_local_path, is_pub=False)
+    coroutine = checker.check_CN(local_path=repository_local_path, is_pub=is_pub)
     rst = asyncio.run(coroutine)
     return rst
 def on_error_occur(url, content):
@@ -67,15 +67,17 @@ def mark_resolved(revision):
 
 if __name__ == "__main__":
     input_revision = -1
+    is_pub = False
     if(len(sys.argv) > 1):
         input_revision = int(sys.argv[1])
     if(len(sys.argv) > 2):
-        is_debug = (sys.argv[2]) == 'debug'
-        if(is_debug):
-            feishu_public_error_url = feishu_self_error_url
+        is_pub = (sys.argv[2]) == 'True' or (sys.argv[2]) == 'true' or (sys.argv[2]) == '1' or (sys.argv[2]) == True
     ret_code = svn_util.checkout_subprocess(repository_local_path)
     if(ret_code.success):
         print("checkout success")
+        if(is_pub):
+            check_excel(config_path.path_in_repo, is_pub)
+            exit(0)
     else:
         on_error_occur(feishu_self_error_url, ret_code.error_content)
     commits, commit_ret_code = svn_util.get_last_one_day_commits(repository_local_path, path_in_repo, days=2)
