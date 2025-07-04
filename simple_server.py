@@ -34,7 +34,7 @@ class SimpleCustomHandler(http.server.SimpleHTTPRequestHandler):
                     coroutine = checker.check_CN(local_path=config_path.repository_local_path, is_pub=True)
                     rst = asyncio.run(coroutine)
                     response = {
-                        'error': rst,
+                        "error":rst,
                     }
                     self._send_json_response(200, response)
                 else:
@@ -51,10 +51,10 @@ class SimpleCustomHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Content-type', content_type)
         self.end_headers()
 
-    def _send_json_response(self, status_code, data):
+    def _send_json_response(self, status_code, data, ensure_ascii=False):
         """Sends a JSON response."""
         self._send_response_header(status_code, 'application/json')
-        self.wfile.write(json.dumps(data).encode('utf-8'))
+        self.wfile.write(json.dumps(data, ensure_ascii=ensure_ascii).encode('utf-8'))
 
     def _send_html_response(self, status_code, html_content):
         """Sends an HTML response."""
