@@ -191,6 +191,11 @@ class LocalizeChecker():
                 "condition": lambda cn, id: "本服、跨服" in cn,
                 "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现本服、跨服\n"
             },
+            # 检查不能出现基地造型
+            {
+                "condition": lambda cn, id: "基地造型" in cn,
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现基地造型 正确的应该是基地皮肤\n"
+            },
         ]
 
         # 发版检查条件在这更新
