@@ -11,3 +11,9 @@ feishu_public_error_url = feishu_self_error_url# "https://open.feishu.cn/open-ap
 record_file_path = ".resolved_revision.txt"
 def get_record_file_path():
     return os.path.join(Path(__file__).parent.absolute(), record_file_path)
+def get_local_excel_special_check_config():
+    return os.path.join(Path(__file__).parent.absolute(), "cn_special_config.json")
+def get_current_git_repo_path():
+    return Path(__file__).parent.absolute()
+def get_cn_special_config_path():
+    return os.path.join(repository_local_path, "Localization/cn_special_config.json")
