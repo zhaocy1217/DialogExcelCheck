@@ -41,21 +41,21 @@ cn_special_decorate_id = set()
 cn_special_base_effect_skin_ids = set()
 cn_special_team_ids = set()
 cn_special_min_ids = set()
-
-cn_special_config = get_cn_special_config()
-def add_cn_special_ids(cn_special_ids, key):
-    for id in cn_special_config[key]:
-        cn_special_ids.add(id)
-add_cn_special_ids(cn_special_I_ids, 'cn_special_I_ids')
-add_cn_special_ids(cn_special_blank_ids, 'cn_special_blank_ids')
-add_cn_special_ids(cn_special_steel_food_ids, 'cn_special_steel_food_ids')
-add_cn_special_ids(cn_special_castle_ids, 'cn_special_castle_ids')
-add_cn_special_ids(cn_special_above_below_ids, 'cn_special_above_below_ids')
-add_cn_special_ids(cn_special_certificate_id, 'cn_special_certificate_id')
-add_cn_special_ids(cn_special_decorate_id, 'cn_special_decorate_id')
-add_cn_special_ids(cn_special_base_effect_skin_ids, 'cn_special_base_effect_skin_ids')
-add_cn_special_ids(cn_special_team_ids, 'cn_special_team_ids')
-add_cn_special_ids(cn_special_min_ids, 'cn_special_min_ids')
+def init_cn_special_ids():
+    cn_special_config = get_cn_special_config()
+    def add_cn_special_ids(cn_special_ids, key):
+        for id in cn_special_config[key]:
+            cn_special_ids.add(id)
+    add_cn_special_ids(cn_special_I_ids, 'cn_special_I_ids')
+    add_cn_special_ids(cn_special_blank_ids, 'cn_special_blank_ids')
+    add_cn_special_ids(cn_special_steel_food_ids, 'cn_special_steel_food_ids')
+    add_cn_special_ids(cn_special_castle_ids, 'cn_special_castle_ids')
+    add_cn_special_ids(cn_special_above_below_ids, 'cn_special_above_below_ids')
+    add_cn_special_ids(cn_special_certificate_id, 'cn_special_certificate_id')
+    add_cn_special_ids(cn_special_decorate_id, 'cn_special_decorate_id')
+    add_cn_special_ids(cn_special_base_effect_skin_ids, 'cn_special_base_effect_skin_ids')
+    add_cn_special_ids(cn_special_team_ids, 'cn_special_team_ids')
+    add_cn_special_ids(cn_special_min_ids, 'cn_special_min_ids')
 
 def extract_revision(excel_name):
     integers = re.findall(r'\d+', excel_name)
@@ -70,7 +70,7 @@ class LocalizeChecker():
         self.name_id = NoticeManager.name_id
         # 记录aps表的各个字段，检查字段删除（新增字段时需更新）
         self.aps_fields = ['id', '1-不需要翻译', 'CN', 'gn_CN', 'CN_patch', '预期时间', '优先级', '签名', '说明1', '说明2', '词条备注：通配符例句、说明', 'crowdin格式专用（勿动）']
-
+        init_cn_special_ids()
     async def check(self, local_path, funcs, is_warn: bool=False, is_pub: bool = False):
         try:
             self.error_message = ""
