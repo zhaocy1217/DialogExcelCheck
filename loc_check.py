@@ -30,7 +30,7 @@ def get_cn_special_config():
 # cn_special_base_effect_skin_ids = {'item_desc610184'}   
 # cn_special_team_ids = {'season_s4_activity1200012_story_desc', 221056, 'battlesystem_info1_new', 1500930, 'city_trade_tips1017', 1501830, 210185, 210186, 210187, 1501330, 'skill_desc_402020_new', 'report_prop25', 2000539, 1501730, 'science_221043_new', 1401130, 1501230, 457009, 1400630, 1500730, 1501630, 372287, 'science_221055_new', 220358, 1401030, 1501130, 'city_trade_tips1012', 'battlesystem_info1', 'power_display_new_002', 801105, 457554, 457555, 457556, 457557, 457558, 457559, 457560, 'science_221044_new', 457561, 457563, 1401430, 1500630, 141150, 1501530, 'skill_desc_402020', 'report_prop24', 1401830, 1501030, 'science_221054_new', 221043, 221044, 221045, 221046, 221047, 1501430, 221049, 'report_helper_strategy_34_detail', 221051, 221053, 221054, 221055}
 # cn_special_min_ids = {'season_s3_update_notice_14'}
-
+# cn_special_ignore_ids = {''}
 cn_special_I_ids = set()
 cn_special_blank_ids = set()
 cn_special_steel_food_ids = set()
@@ -41,11 +41,13 @@ cn_special_decorate_id = set()
 cn_special_base_effect_skin_ids = set()
 cn_special_team_ids = set()
 cn_special_min_ids = set()
+cn_special_ignore_ids = set()
 def init_cn_special_ids():
     cn_special_config = get_cn_special_config()
     def add_cn_special_ids(cn_special_ids, key):
-        for id in cn_special_config[key]:
-            cn_special_ids.add(id)
+        if(key in cn_special_config):
+            for id in cn_special_config[key]:
+                cn_special_ids.add(id)
     add_cn_special_ids(cn_special_I_ids, 'cn_special_I_ids')
     add_cn_special_ids(cn_special_blank_ids, 'cn_special_blank_ids')
     add_cn_special_ids(cn_special_steel_food_ids, 'cn_special_steel_food_ids')
@@ -56,6 +58,7 @@ def init_cn_special_ids():
     add_cn_special_ids(cn_special_base_effect_skin_ids, 'cn_special_base_effect_skin_ids')
     add_cn_special_ids(cn_special_team_ids, 'cn_special_team_ids')
     add_cn_special_ids(cn_special_min_ids, 'cn_special_min_ids')
+    add_cn_special_ids(cn_special_ignore_ids, 'cn_special_ignore_ids')
 
 def extract_revision(excel_name):
     integers = re.findall(r'\d+', excel_name)
@@ -200,33 +203,38 @@ class LocalizeChecker():
             },
              # 检查不能出现大地图、野外
             {
-                "condition": lambda cn, id: "大地图" in cn or "野外" in cn,
+                "condition": lambda cn, id: "大地图" in cn or "野外" in cn and id not in cn_special_ignore_ids,
                 "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现大地图、野外\n"
             },
              # 检查不能出现资源点
             {
-                "condition": lambda cn, id: "资源点" in cn,
+                "condition": lambda cn, id: "资源点" in cn and id not in cn_special_ignore_ids,
                 "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现资源点\n"
             },
              # 检查不能出现雷达事件
             {
-                "condition": lambda cn, id: "雷达事件" in cn,
+                "condition": lambda cn, id: "雷达事件" in cn and id not in cn_special_ignore_ids,
                 "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现雷达事件\n"
             },
              # 检查不能出现士气值
             {
-                "condition": lambda cn, id: "士气值" in cn,
+                "condition": lambda cn, id: "士气值" in cn and id not in cn_special_ignore_ids,
                 "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现士气值\n"
             },
             # 检查不能出现本服、跨服
             {
-                "condition": lambda cn, id: "本服、跨服" in cn,
+                "condition": lambda cn, id: "本服、跨服" in cn and id not in cn_special_ignore_ids,
                 "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现本服、跨服\n"
             },
             # 检查不能出现基地造型
             {
-                "condition": lambda cn, id: "基地造型" in cn,
+                "condition": lambda cn, id: "基地造型" in cn and id not in cn_special_ignore_ids,
                 "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现基地造型 正确的应该是基地皮肤\n"
+            },
+            # 检查不能出现全服
+            {
+                "condition": lambda cn, id: "全服" in cn and id not in cn_special_ignore_ids,
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现全服 正确的应该是全战区\n"
             },
         ]
 
