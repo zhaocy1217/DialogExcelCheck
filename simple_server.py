@@ -8,6 +8,7 @@ import svn_util
 import config_path
 import loc_check
 import os
+import traceback
 # --- Configuration ---
 PORT = 8090 # The port your server will listen on
 HOST = "0.0.0.0" # "0.0.0.0" for all interfaces, "127.0.0.1" for local only
@@ -22,6 +23,14 @@ class SimpleCustomHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         super().do_GET()
+    def send_fs_notice(self, content, is_error = True):
+        loc_check.NoticeManager().send_file_notice(
+            url= config_path.feishu_self_error_url,
+            title='错误通知',
+            content=content, 
+            is_error=is_error,
+            error_usrs={loc_check.NoticeManager().name_id.get('赵超跃'), loc_check.NoticeManager().name_id.get('田明东')}
+        )
 
     def do_POST(self):
         print('receive request')
@@ -38,11 +47,19 @@ class SimpleCustomHandler(http.server.SimpleHTTPRequestHandler):
                     }
                     self._send_json_response(200, response)
                 else:
-                    self._send_error_response(400, ret_code.error_content)
+                    error_content = 'svn checkout failed: SVN is using or locked.' + ret_code.error_content
+                    self.send_fs_notice(error_content)
+                    self._send_error_response(400, error_content)
             except Exception as e:
-                self._send_error_response(400, str(e))
+                error_content = str(e)
+                self.send_fs_notice(error_content)
+                self._send_error_response(400, error_content)
+        elif self.path == '/test':
+            self._send_error_response(400, 'svn checkout failed: SVN正在被占用或者有锁,请稍后再试')
         else:
-            self._send_error_response(400, 'invalid path')
+            error_content = 'url 调用错误: invalid path'
+            self.send_fs_notice(error_content)
+            self._send_error_response(400, error_content)
         
     # --- Helper Methods for Sending Responses ---
     def _send_response_header(self, status_code, content_type):
@@ -68,8 +85,8 @@ class SimpleCustomHandler(http.server.SimpleHTTPRequestHandler):
 
     def _send_error_response(self, status_code, message):
         """Sends an error response with a plain text message."""
+        message = message.encode('ascii', errors='ignore').decode('ascii')
         self.send_error(status_code, message)
-
     def log_message(self, format, *args):
         """Override to customize or suppress server log messages."""
         # You can add custom logging here, e.g., to a file.
