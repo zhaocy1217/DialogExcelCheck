@@ -16,8 +16,9 @@ def check_excel(excel_name, is_pub = False):
     checker = loc_check.LocalizeChecker()
     checker.excel_name = excel_name
     coroutine = checker.check_CN(local_path=repository_local_path, is_pub=is_pub)
-    rst = asyncio.run(coroutine)
-    return rst
+    asyncio.run(coroutine)
+    coroutine2 = checker.warn_CN(local_path=repository_local_path)
+    asyncio.run(coroutine2)
 def on_error_occur(url, content):
     cur_excel_file_full_name = os.path.join(repository_local_path, cur_excel_file_name)
     last_excel_file_full_name = os.path.join(repository_local_path, last_excel_file_name)
@@ -80,7 +81,7 @@ if __name__ == "__main__":
             exit(0)
     else:
         on_error_occur(feishu_self_error_url, ret_code.error_content)
-    commits, commit_ret_code = svn_util.get_last_one_day_commits(repository_local_path, path_in_repo, days=2)
+    commits, commit_ret_code = svn_util.get_last_one_day_commits(repository_local_path, path_in_repo, days=200)
     if(commit_ret_code is not None and not commit_ret_code.success):
         on_error_occur(feishu_self_error_url, commit_ret_code.error_content)
     if(commits is None or len(commits) == 0):
