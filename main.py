@@ -17,8 +17,13 @@ def check_excel(excel_name, is_pub = False):
     checker.excel_name = excel_name
     coroutine = checker.check_CN(local_path=repository_local_path, is_pub=is_pub)
     asyncio.run(coroutine)
-    coroutine2 = checker.warn_CN(local_path=repository_local_path)
-    asyncio.run(coroutine2)
+    # coroutine2 = checker.warn_CN(local_path=repository_local_path)
+    # asyncio.run(coroutine2)
+def check_excel_warn_CN(excel_name):
+    checker = loc_check.LocalizeChecker()
+    checker.excel_name = excel_name
+    coroutine = checker.warn_CN(local_path=repository_local_path)
+    asyncio.run(coroutine)
 def on_error_occur(url, content):
     cur_excel_file_full_name = os.path.join(repository_local_path, cur_excel_file_name)
     last_excel_file_full_name = os.path.join(repository_local_path, last_excel_file_name)
@@ -69,15 +74,21 @@ def mark_resolved(revision):
 if __name__ == "__main__":
     input_revision = -1
     only_check_excel_is_pub = False
+    only_check_excel_warn_CN = False
     if(len(sys.argv) > 1):
         input_revision = int(sys.argv[1])
     if(len(sys.argv) > 2):
         only_check_excel_is_pub = (sys.argv[2]) == 'True' or (sys.argv[2]) == 'true' or (sys.argv[2]) == '1' or (sys.argv[2]) == True
+    if(len(sys.argv) > 3):
+        only_check_excel_warn_CN = (sys.argv[3]) == 'True' or (sys.argv[3]) == 'true' or (sys.argv[3]) == '1' or (sys.argv[3]) == True
     ret_code = svn_util.checkout_subprocess(repository_local_path)
     if(ret_code.success):
         print("checkout success")
         if(only_check_excel_is_pub):
             check_excel(config_path.path_in_repo, True)
+            exit(0)
+        if(only_check_excel_warn_CN):
+            check_excel_warn_CN(config_path.path_in_repo)
             exit(0)
     else:
         on_error_occur(feishu_self_error_url, ret_code.error_content)
