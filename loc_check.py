@@ -236,6 +236,11 @@ class LocalizeChecker():
                 "condition": lambda cn, id: "全服" in cn and id not in cn_special_ignore_ids,
                 "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现全服 正确的应该是全战区\n"
             },
+            # 检查不能出现全服
+            {
+                "condition": lambda cn, id: "王座" in cn and id not in cn_special_ignore_ids,
+                "error_message": lambda id, cn: f"【{excel_name_for_msg}】【id={id}】【cn={cn}】出现王座 正确的应该是国会n"
+            },
         ]
 
         # 发版检查条件在这更新
